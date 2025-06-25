@@ -3,7 +3,6 @@
 # ===============================
 # LuciferHEx Termux Color Setup
 # ===============================
-
 if tput setaf 1 &>/dev/null; then
     COLOR_SUPPORT=true
 else
@@ -22,7 +21,6 @@ else
     RED='' GREEN='' YELLOW='' BLUE='' CYAN='' WHITE='' RESET=''
 fi
 
-
 SUCCESS="${GREEN}✔${RESET}"
 FAILED="${RED}✖${RESET}"
 ARROW="${CYAN}➤${RESET}"
@@ -30,7 +28,3 @@ INFO="${BLUE}[i]${RESET}"
 WARN="${YELLOW}[!]${RESET}"
 ADDED="${GREEN}[+]${RESET}"
 FAILS="${RED}[-]${RESET}"
-
-
-export RED GREEN YELLOW BLUE CYAN WHITE RESET
-export SUCCESS FAILED ARROW INFO WARN ADDED FAILS
