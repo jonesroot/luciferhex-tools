@@ -124,11 +124,15 @@ update_tools() {
 
     if [[ ! -d "$repo_dir" ]]; then
         echo -e "${FAILED} Repo folder not found: $repo_dir${RESET}"
+        read -n 1 -s -r -p $'\nPress any key to return to main menu...'
+        main_menu
         return
     fi
 
     cd "$repo_dir" && git pull || {
         echo -e "${FAILED} Failed to pull latest changes.${RESET}"
+        read -n 1 -s -r -p $'\nPress any key to return to main menu...'
+        main_menu
         return
     }
 
@@ -142,17 +146,20 @@ update_tools() {
     echo -e "${INFO} Setting permission for setup.sh...${RESET}"
     chmod +x "$setup_script" || {
         echo -e "${FAILED} Cannot make setup.sh executable.${RESET}"
+        read -n 1 -s -r -p $'\nPress any key to return to main menu...'
+        main_menu
         return
     }
 
     echo -e "${INFO} Running setup.sh...${RESET}"
     if bash "$setup_script"; then
         echo -e "${SUCCESS} Tools updated.${RESET}"
-        read -n 1 -s -r -p $'\nPress any key to return to main menu...'
-        main_menu
     else
         echo -e "${FAILED} Setup failed. Please check manually.${RESET}"
     fi
+
+    read -n 1 -s -r -p $'\nPress any key to return to main menu...'
+    main_menu
 }
 
 uninstall_tools() {
