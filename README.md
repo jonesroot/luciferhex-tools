@@ -25,11 +25,18 @@ vpsmenu
 
 ```bash
 LuciferHEx-Termux-Tools/
+├── README.md
 ├── setup.sh
-├── bin/vpsmenu
-├── lib/colors.sh
-├── data/sample_vps_list
-└── assets/banner.txt
+├── .gitignore
+├── LICENSE
+├── bin/
+│   └── vpsmenu)
+├── lib/
+│   └── colors.sh
+├── data/
+│   └── sample_vps_list
+└── assets/
+    └── banner.txt
 ```
 
 ---
