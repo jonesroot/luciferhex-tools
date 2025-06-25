@@ -10,13 +10,13 @@ else
 fi
 
 if [ "$COLOR_SUPPORT" = true ]; then
-    RED='\e[1;31m'
-    GREEN='\e[1;32m'
-    YELLOW='\e[1;33m'
-    BLUE='\e[1;34m'
-    CYAN='\e[1;36m'
-    WHITE='\e[1;37m'
-    RESET='\e[0m'
+    RED=$'\e[1;31m'
+    GREEN=$'\e[1;32m'
+    YELLOW=$'\e[1;33m'
+    BLUE=$'\e[1;34m'
+    CYAN=$'\e[1;36m'
+    WHITE=$'\e[1;37m'
+    RESET=$'\e[0m'
 else
     RED='' GREEN='' YELLOW='' BLUE='' CYAN='' WHITE='' RESET=''
 fi
