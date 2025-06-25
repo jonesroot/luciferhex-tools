@@ -1,4 +1,5 @@
 #!/data/data/com.termux/files/usr/bin/bash
+clear
 source "$HOME/.luciferhex/colors.sh"
 
 vps_file="$HOME/.luciferhex_vps_list"
