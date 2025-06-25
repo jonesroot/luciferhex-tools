@@ -1,0 +1,30 @@
+# Ignore Termux-specific files
+.bash_history
+.zsh_history
+.termux
+
+# Ignore Python/IDE/OS stuff
+__pycache__/
+*.py[cod]
+*.swp
+*.swo
+*.bak
+
+# Ignore user data and cache
+*.log
+*.tmp
+*.out
+.DS_Store
+Thumbs.db
+
+# Ignore SSH or credential data
+.luciferhex_vps_list
+
+# Node/npm
+node_modules/
+
+# VSCode
+.vscode/
+
+# Backup
+*~
