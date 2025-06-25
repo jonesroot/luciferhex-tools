@@ -31,8 +31,12 @@ print_menu() {
     printf "${CYAN}%0.s=" $(seq 1 $term_width)
     echo -e "${RESET}"
 
-    local title="Welcome to LuciferHEx Termux Tools"
-    printf "%*s\n" $(( (term_width + ${#title}) / 2 )) "${GREEN}${title}${RESET}"
+    local title_plain="Welcome to LuciferHEx Termux Tools"
+    local title_colored="${GREEN}${title_plain}${RESET}"
+    local title_len=${#title_plain}
+    local space_before=$(( (term_width - title_len) / 2 ))
+    local spaces=$(printf "%${space_before}s" "")
+    echo -e "${spaces}${title_colored}"
 
     printf "${CYAN}%0.s=" $(seq 1 $term_width)
     echo -e "${RESET}\n"
