@@ -1,0 +1,133 @@
+#!/data/data/com.termux/files/usr/bin/bash
+
+source "$HOME/.luciferhex/colors.sh"
+
+luciferhex_main_menu() {
+    clear
+    echo -e "${RED}=========================================="
+    echo -e "     Welcome to LuciferHEx Tools Termux   "
+    echo -e "==========================================${RESET}"
+    echo ""
+    echo -e " ${ARROW} Apa yang ingin kamu lakukan?"
+    echo ""
+    echo " 1) Login as Termux"
+    echo " 2) Login as VPS"
+    echo " 3) Add New VPS"
+    echo " 4) Remove VPS"
+    echo " x) Exit"
+    echo ""
+    read -p "[>] Pilih: " menu_choice
+
+    case $menu_choice in
+        1) echo -e "${SUCCESS} Logged in as Termux." ;;
+        2) luciferhex_vps_login_menu ;;
+        3) luciferhex_add_vps ;;
+        4) luciferhex_remove_vps ;;
+        x|X) exit ;;
+        *) echo -e "${FAILED} Invalid option."; sleep 1; luciferhex_main_menu ;;
+    esac
+}
+
+luciferhex_vps_login_menu() {
+    clear
+    echo -e "${BLUE}=================================="
+    echo -e "     List VPS on this Device      "
+    echo -e "==================================${RESET}"
+
+    if [ ! -f ~/.luciferhex_vps_list ]; then
+        echo -e "${WARN} Tidak ada VPS. Tambahkan dulu.${RESET}"
+        sleep 2
+        luciferhex_main_menu
+        return
+    fi
+
+    i=1
+    unset vps_choices
+    while IFS="|" read -r name ip user pass; do
+        echo "$i) $name [$ip]"
+        vps_choices[$i]="$name|$ip|$user|$pass"
+        ((i++))
+    done < ~/.luciferhex_vps_list
+
+    echo "99) Back"
+    echo ""
+    read -p "[>] Pilih VPS untuk login: " vps_choice
+
+    if [[ "$vps_choice" == "99" ]]; then
+        luciferhex_main_menu
+        return
+    fi
+
+    selected="${vps_choices[$vps_choice]}"
+    if [ -z "$selected" ]; then
+        echo -e "${FAILED} Pilihan tidak valid.${RESET}"
+    else
+        name=$(echo "$selected" | cut -d'|' -f1)
+        ip=$(echo "$selected" | cut -d'|' -f2)
+        user=$(echo "$selected" | cut -d'|' -f3)
+        pass=$(echo "$selected" | cut -d'|' -f4)
+        echo -e "${INFO} Logging into ${WHITE}$name [$ip]${RESET}..."
+
+        if command -v sshpass > /dev/null 2>&1; then
+            sshpass -p "$pass" ssh -tt -o StrictHostKeyChecking=no "$user@$ip"
+        else
+            echo -e "${WARN} sshpass tidak ditemukan. Menginstal...${RESET}"
+            pkg install -y sshpass
+            sshpass -p "$pass" ssh "$user@$ip"
+        fi
+    fi
+}
+
+luciferhex_add_vps() {
+    echo ""
+    read -p "[+] Nama VPS        : " vps_name
+    read -p "[+] IP VPS          : " vps_ip
+    read -p "[+] Username SSH    : " vps_user
+    read -s -p "[+] Password SSH    : " vps_pass
+    echo ""
+    echo "$vps_name|$vps_ip|$vps_user|$vps_pass" >> ~/.luciferhex_vps_list
+    echo -e "${SUCCESS} VPS berhasil ditambahkan.${RESET}"
+    sleep 1
+    luciferhex_main_menu
+}
+
+luciferhex_remove_vps() {
+    if [ ! -f ~/.luciferhex_vps_list ]; then
+        echo -e "${FAILED} Tidak ada VPS untuk dihapus.${RESET}"
+        sleep 2
+        luciferhex_main_menu
+        return
+    fi
+
+    echo -e "${YELLOW}Daftar VPS:${RESET}"
+    i=1
+    unset vps_choices
+    while IFS="|" read -r name ip; do
+        echo "$i) $name [$ip]"
+        vps_choices[$i]="$name|$ip"
+        ((i++))
+    done < ~/.luciferhex_vps_list
+
+    echo "99) Back"
+    echo ""
+    read -p "[>] Pilih VPS yang ingin dihapus: " vps_choice
+
+    if [[ "$vps_choice" == "99" ]]; then
+        luciferhex_main_menu
+        return
+    fi
+
+    if [ -z "${vps_choices[$vps_choice]}" ]; then
+        echo -e "${FAILED} Pilihan tidak valid.${RESET}"
+        sleep 1
+        luciferhex_main_menu
+        return
+    fi
+
+    sed -i "${vps_choice}d" ~/.luciferhex_vps_list
+    echo -e "${SUCCESS} VPS berhasil dihapus.${RESET}"
+    sleep 1
+    luciferhex_main_menu
+}
+
+luciferhex_main_menu
