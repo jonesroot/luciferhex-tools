@@ -3,98 +3,228 @@ source "$HOME/.luciferhex/colors.sh"
 
 vps_file="$HOME/.luciferhex_vps_list"
 
-main_menu() {
-    clear
+print_menu() {
+    local -a items=(
+        "Login as Termux"
+        "Login as VPS"
+        "Add New VPS"
+        "Remove VPS"
+        "Backup VPS"
+        "Restore VPS"
+        "Update Tools"
+        "About LuciferHEx"
+        "Settings"
+        "Help"
+    )
+
+    local total=${#items[@]}
+    local half=$(( (total + 1) / 2 ))
+
     echo -e "${CYAN}==========================================${RESET}"
     echo -e "     ${GREEN}Welcome to LuciferHEx Tools Termux${RESET}   "
     echo -e "${CYAN}==========================================${RESET}"
     echo ""
-    echo -e "${ARROW} ${YELLOW}What do you want to do?${RESET}"
-    echo ""
-    echo -e "${ARROW} ${CYAN}1)${RESET} ${GREEN}Login as Termux${RESET}"
-    echo -e "${ARROW} ${CYAN}2)${RESET} ${GREEN}Login as VPS${RESET}"
-    echo -e "${ARROW} ${CYAN}3)${RESET} ${GREEN}Add New VPS${RESET}"
-    echo -e "${ARROW} ${CYAN}4)${RESET} ${RED}Remove VPS${RESET}"
-    echo -e "${ARROW} ${CYAN}x)${RESET} ${RED}Exit${RESET}"
-    echo ""
-    read -p "${CYAN}[>]${RESET} ${YELLOW}Please Choose Number 1-4 or x for${RESET} ${RED}Exit${RESET}${CYAN}:${RESET} " menu
 
-    case "$menu" in
-        1) echo -e "${SUCCESS} Logged in as Termux." ;;
+    for ((i = 0; i < half; i++)); do
+        left_num=$((i + 1))
+        right_num=$((i + half + 1))
+
+        left_text="${CYAN}${left_num})${RESET} ${YELLOW}${items[i]}${RESET}"
+        
+        if [ $right_num -le $total ]; then
+            right_text="${CYAN}${right_num})${RESET} ${YELLOW}${items[right_num - 1]}${RESET}"
+            printf "  %-30s %s\n" "$left_text" "$right_text"
+        else
+            printf "  %s\n" "$left_text"
+        fi
+    done
+
+    echo ""
+    echo -e "${CYAN}x)${RESET} ${RED}Exit${RESET}"
+    echo ""
+    read -p "${CYAN}[>]${RESET} ${YELLOW}Please choose a number or 'x' to exit:${RESET} " menu_choice
+}
+
+main_menu() {
+    clear
+    print_menu
+    case "$menu_choice" in
+        1) echo -e "${SUCCESS} Logged in as Termux.${RESET}" ;;
         2) login_vps ;;
         3) add_vps ;;
         4) remove_vps ;;
-        x|X) exit ;;
-        *) echo -e "${FAILED} Invalid selection."; sleep 1; main_menu ;;
+        5) backup_vps ;;
+        6) restore_vps ;;
+        7) update_tools ;;
+        8) about_luciferhex ;;
+        9) settings_menu ;;
+       10) help_menu ;;
+        x|X) echo -e "${INFO} Exiting...${RESET}"; exit ;;
+        *) echo -e "${FAILED} Invalid selection.${RESET}"; sleep 1 ;;
     esac
+    read -n 1 -s -r -p $'\nPress any key to return to menu...'
+    main_menu
 }
+
+backup_vps() {
+    local backup_file="$HOME/.luciferhex/vps_backup_$(date +%Y%m%d_%H%M%S).bak"
+    cp "$vps_file" "$backup_file" && \
+        echo -e "${SUCCESS} VPS list backed up to: ${CYAN}$backup_file${RESET}" || \
+        echo -e "${FAILED} Failed to backup VPS list.${RESET}"
+}
+
+restore_vps() {
+    echo -e "${INFO} Available backups:${RESET}"
+    local backups=("$HOME/.luciferhex"/vps_backup_*.bak)
+    local i=1
+    for f in "${backups[@]}"; do
+        echo -e "${CYAN}$i)${RESET} ${YELLOW}$(basename "$f")${RESET}"
+        choices[$i]="$f"
+        ((i++))
+    done
+    echo -e "${CYAN}99)${RESET} ${RED}Cancel${RESET}"
+    read -p "${CYAN}[>]${RESET} ${YELLOW}Select a backup to restore:${RESET} " choice
+
+    [[ "$choice" == "99" ]] && return
+
+    if [[ -n "${choices[$choice]}" ]]; then
+        cp "${choices[$choice]}" "$vps_file" && \
+            echo -e "${SUCCESS} Restored VPS list from backup.${RESET}" || \
+            echo -e "${FAILED} Restore failed.${RESET}"
+    else
+        echo -e "${FAILED} Invalid choice.${RESET}"
+    fi
+}
+
+update_tools() {
+    echo -e "${INFO} Updating LuciferHEx Tools...${RESET}"
+    cd "$HOME/luciferhex-tools" && git pull && \
+        echo -e "${SUCCESS} Tools updated successfully.${RESET}" || \
+        echo -e "${FAILED} Update failed. Check connection or repo.${RESET}"
+}
+
+about_luciferhex() {
+    echo -e "${CYAN}LuciferHEx Tools${RESET}"
+    echo -e "${YELLOW}Version:${RESET} 1.0.0"
+    echo -e "${YELLOW}Author:${RESET} LuciferHEx"
+    echo -e "${YELLOW}GitHub:${RESET} @JonesRoot"
+    echo -e "${YELLOW}Telegram:${RESET} @LuciferReborns"
+    echo -e "${YELLOW}Instagram:${RESET} @GuaGatauDah"
+    echo -e "\n${GREEN}This tool helps manage VPS and Termux with a lightweight and modular menu interface.${RESET}"
+}
+
+settings_menu() {
+    echo -e "${INFO} Settings menu is under development.${RESET}"
+}
+
+help_menu() {
+    echo -e "${CYAN}Help - LuciferHEx Tools${RESET}"
+    echo -e "${YELLOW}1-4:${RESET} Manage and login to VPS"
+    echo -e "${YELLOW}5:${RESET} Backup VPS list"
+    echo -e "${YELLOW}6:${RESET} Restore VPS list from backup"
+    echo -e "${YELLOW}7:${RESET} Update tools dari GitHub"
+    echo -e "${YELLOW}8:${RESET} Info tentang tools"
+    echo -e "${YELLOW}9:${RESET} Settings menu (On Going)"
+    echo -e "${YELLOW}10:${RESET} Showing help"
+    echo -e "${YELLOW}x:${RESET} Exit tools"
+}
+
+# main_menu() {
+#     clear
+#     echo -e "${CYAN}==========================================${RESET}"
+#     echo -e "     ${GREEN}Welcome to LuciferHEx Termux Tools${RESET}   "
+#     echo -e "${CYAN}==========================================${RESET}"
+#     echo ""
+#     echo -e "${ARROW} ${YELLOW}What do you want to do?${RESET}"
+#     echo ""
+#     echo -e "${ARROW} ${CYAN}1)${RESET} ${GREEN}Login as Termux${RESET}"
+#     echo -e "${ARROW} ${CYAN}2)${RESET} ${GREEN}Login as VPS${RESET}"
+#     echo -e "${ARROW} ${CYAN}3)${RESET} ${YELLOW}Add New VPS${RESET}"
+#     echo -e "${ARROW} ${CYAN}4)${RESET} ${RED}Remove VPS${RESET}"
+#     echo -e "${ARROW} ${CYAN}x)${RESET} ${RED}Exit${RESET}"
+#     echo ""
+#     read -p "${CYAN}[>]${RESET} ${YELLOW}Please choose [1-4] or 'x' to exit${RESET}${CYAN}:${RESET} " menu
+# 
+#     case "$menu" in
+#         1) echo -e "${SUCCESS} Logged in as Termux.${RESET}" ;;
+#         2) login_vps ;;
+#         3) add_vps ;;
+#         4) remove_vps ;;
+#         x|X) echo -e "${INFO} Exiting...${RESET}"; exit ;;
+#         *) echo -e "${FAILED} Invalid selection.${RESET}"; sleep 1; main_menu ;;
+#     esac
+# }
+# 
 
 login_vps() {
     clear
     echo -e "${CYAN}==================================${RESET}"
     echo -e "     ${GREEN}List VPS on this Device${RESET}      "
     echo -e "${CYAN}==================================${RESET}"
-    [[ ! -f "$vps_file" ]] && echo "No VPS found." && sleep 2 && main_menu
+
+    [[ ! -f "$vps_file" ]] && echo -e "${FAILED} No VPS found.${RESET}" && sleep 2 && main_menu
 
     i=1
     unset vps_choices
     while IFS="|" read -r name ip user pass; do
-        echo "$i) $name [$ip]"
+        echo -e "${CYAN}$i)${RESET} ${GREEN}$name${RESET} ${YELLOW}[$ip]${RESET}"
         vps_choices[$i]="$name|$ip|$user|$pass"
         ((i++))
     done < "$vps_file"
 
-    echo "99) Back"
-    read -p "${CYAN}[>]${RESET} ${YELLOW}Please Choose a number of VPS below:${RESET} " choice
+    echo -e "${CYAN}99)${RESET} ${RED}Back${RESET}"
+    read -p "${CYAN}[>]${RESET} ${YELLOW}Choose a VPS number:${RESET} " choice
 
     [[ "$choice" == "99" ]] && main_menu
 
     selected="${vps_choices[$choice]}"
-    [[ -z "$selected" ]] && echo -e "${FAILED} Invalid selection." && sleep 1 && login_vps
+    [[ -z "$selected" ]] && echo -e "${FAILED} Invalid selection.${RESET}" && sleep 1 && login_vps
 
     IFS="|" read -r name ip user pass <<< "$selected"
-    echo -e "${INFO} Login to $name [$ip] as $user ..${RESET}"
+    echo -e "${INFO} Logging into ${GREEN}$name${RESET} ${YELLOW}[$ip]${RESET} as ${CYAN}$user${RESET} ..."
     sshpass -p "$pass" ssh -tt -o StrictHostKeyChecking=no "$user@$ip"
 }
 
 add_vps() {
     echo ""
-    read -p "[+] VPS Name: " name
-    read -p "[+] IP VPS  : " ip
-    read -p "[+] Username: " user
-    read -s -p "[+] Password: " pass
+    echo -e "${INFO} Enter VPS information below:${RESET}"
+    read -p "${CYAN}[+]${RESET} VPS Name    : " name
+    read -p "${CYAN}[+]${RESET} VPS IP      : " ip
+    read -p "${CYAN}[+]${RESET} Username    : " user
+    read -s -p "${CYAN}[+]${RESET} Password    : " pass
     echo ""
     echo "$name|$ip|$user|$pass" >> "$vps_file"
-    echo -e "${SUCCESS} VPS successfully added!"
+    echo -e "${SUCCESS} VPS successfully added!${RESET}"
     sleep 1
     main_menu
 }
 
 remove_vps() {
-    [[ ! -f "$vps_file" ]] && echo -e "${FAILED} No VPS." && sleep 2 && main_menu
-    echo -e "${YELLOW}List VPS:${RESET}"
+    [[ ! -f "$vps_file" ]] && echo -e "${FAILED} No VPS found.${RESET}" && sleep 2 && main_menu
+    echo -e "${YELLOW}List of VPS:${RESET}"
+
     i=1
     unset vps_choices
-    while IFS="|" read -r name ip; do
-        echo "$i) $name [$ip]"
+    while IFS="|" read -r name ip user pass; do
+        echo -e "${CYAN}$i)${RESET} ${GREEN}$name${RESET} ${YELLOW}[$ip]${RESET}"
         vps_choices[$i]="$name|$ip"
         ((i++))
     done < "$vps_file"
 
-    echo "99) Back"
-    read -p "[>] Select the VPS to be deleted: " del_choice
+    echo -e "${CYAN}99)${RESET} ${RED}Back${RESET}"
+    read -p "${CYAN}[>]${RESET} ${YELLOW}Select VPS to delete:${RESET} " del_choice
 
     [[ "$del_choice" == "99" ]] && main_menu
 
     if [[ -n "${vps_choices[$del_choice]}" ]]; then
         sed -i "${del_choice}d" "$vps_file"
-        echo -e "${SUCCESS} VPS successfully deleted."
+        echo -e "${SUCCESS} VPS successfully deleted.${RESET}"
     else
-        echo -e "${FAILED} Invalid selection."
+        echo -e "${FAILED} Invalid selection.${RESET}"
     fi
     sleep 1
     main_menu
 }
 
-cat "$HOME/.luciferhex/banner.txt"
+[[ -f "$HOME/.luciferhex/banner.txt" ]] && cat "$HOME/.luciferhex/banner.txt"
 main_menu
