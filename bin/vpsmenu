@@ -117,9 +117,40 @@ restore_vps() {
 
 update_tools() {
     echo -e "${INFO} Updating LuciferHEx Tools...${RESET}"
-    cd "$HOME/luciferhex-tools" && git pull && \
-        echo -e "${SUCCESS} Tools updated successfully.${RESET}" || \
-        echo -e "${FAILED} Update failed. Check connection or repo.${RESET}"
+    local repo_dir="$HOME/luciferhex-tools"
+    local bin_dir="$PREFIX/bin"
+    local commands="vpsmenu"
+    local setup_script="$repo_dir/setup.sh"
+
+    if [[ ! -d "$repo_dir" ]]; then
+        echo -e "${FAILED} Repo folder not found: $repo_dir${RESET}"
+        return
+    fi
+
+    cd "$repo_dir" && git pull || {
+        echo -e "${FAILED} Failed to pull latest changes.${RESET}"
+        return
+    }
+
+    echo -e "${INFO} Removing old commands...${RESET}"
+    for cmd in "${commands[@]}"; do
+        if [[ -e "$bin_dir/$cmd" ]]; then
+            rm -f "$bin_dir/$cmd" && echo -e "${SUCCESS} Removed: ${CYAN}$cmd${RESET}"
+        fi
+    done
+
+    echo -e "${INFO} Setting permission for setup.sh...${RESET}"
+    chmod +x "$setup_script" || {
+        echo -e "${FAILED} Cannot make setup.sh executable.${RESET}"
+        return
+    }
+
+    echo -e "${INFO} Running setup.sh...${RESET}"
+    bash "$setup_script" && \
+        echo -e "${SUCCESS} Tools updated.${RESET}" || \
+        echo -e "${FAILED} Setup failed. Please check manually.${RESET}"
+    read -n 1 -s -r -p $'\nPress any key to return to main menu...'
+    main_menu
 }
 
 about_luciferhex() {
