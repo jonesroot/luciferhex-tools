@@ -19,11 +19,15 @@ print_menu() {
 
     local term_width=$(tput cols)
     local half=$(( (${#items[@]} + 1) / 2 ))
+    local padding_between=6  # spasi antar kolom
+
     local maxlen=0
     for item in "${items[@]}"; do
         [[ ${#item} -gt $maxlen ]] && maxlen=${#item}
     done
-    local col_width=$((maxlen + 6))
+
+    local col_width=$((maxlen + 4))  # "10) " + teks
+
     printf "${CYAN}%0.s=" $(seq 1 $term_width)
     echo -e "${RESET}"
 
@@ -34,15 +38,22 @@ print_menu() {
     echo -e "${RESET}\n"
 
     for ((i = 0; i < half; i++)); do
-        left_idx=$((i + 1))
-        right_idx=$((i + half + 1))
+        local left_idx=$((i + 1))
+        local right_idx=$((i + half + 1))
 
-        left_text="${CYAN}${left_idx})${RESET} ${YELLOW}${items[i]}${RESET}"
-        printf "  %-*s" $col_width "$left_text"
+        local left_text_plain="${left_idx}) ${items[i]}"
+        local right_text_plain=""
+        [[ $right_idx -le ${#items[@]} ]] && right_text_plain="${right_idx}) ${items[right_idx - 1]}"
 
-        if [ $right_idx -le ${#items[@]} ]; then
-            right_text="${CYAN}${right_idx})${RESET} ${YELLOW}${items[right_idx - 1]}${RESET}"
-            printf "%s" "$right_text"
+        local space_count=$((col_width - ${#left_text_plain}))
+        local spaces=$(printf "%${space_count}s" "")
+        local between=$(printf "%${padding_between}s" "")
+
+        printf "  ${CYAN}%s)${RESET} ${YELLOW}%s${RESET}%s%s" \
+            "$left_idx" "${items[i]}" "$spaces" "$between"
+
+        if [ -n "$right_text_plain" ]; then
+            printf "${CYAN}%s)${RESET} ${YELLOW}%s${RESET}" "$right_idx" "${items[right_idx - 1]}"
         fi
         echo
     done
