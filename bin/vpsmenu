@@ -192,6 +192,8 @@ about_luciferhex() {
     echo -e "${YELLOW}Telegram:${RESET} @LuciferReborns"
     echo -e "${YELLOW}Instagram:${RESET} @GuaGatauDah"
     echo -e "\n${GREEN}This tool helps manage VPS and Termux with a lightweight and modular menu interface.${RESET}"
+    read -n 1 -s -r -p $'\nPress any key to return to main menu...'
+    main_menu
 }
 
 settings_menu() {
@@ -208,6 +210,8 @@ help_menu() {
     echo -e "${YELLOW}9:${RESET} Settings menu (On Going)"
     echo -e "${YELLOW}10:${RESET} Showing help"
     echo -e "${YELLOW}x:${RESET} Exit tools"
+    read -n 1 -s -r -p $'\nPress any key to return to main menu...'
+    main_menu
 }
 
 login_vps() {
