@@ -147,10 +147,10 @@ update_tools() {
 
     echo -e "${INFO} Running setup.sh...${RESET}"
     bash "$setup_script" && \
-        echo -e "${SUCCESS} Tools updated.${RESET}" || \
+        echo -e "${SUCCESS} Tools updated.${RESET}" && \
+        read -n 1 -s -r -p $'\nPress any key to return to main menu...'
+        main_menu || \
         echo -e "${FAILED} Setup failed. Please check manually.${RESET}"
-    read -n 1 -s -r -p $'\nPress any key to return to main menu...'
-    main_menu
 }
 
 about_luciferhex() {
