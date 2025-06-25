@@ -68,8 +68,6 @@ main_menu() {
         x|X) echo -e "${INFO} Exiting...${RESET}"; exit ;;
         *) echo -e "${FAILED} Invalid selection.${RESET}"; sleep 1 ;;
     esac
-    read -n 1 -s -r -p $'\nPress any key to return to menu...'
-    main_menu
 }
 
 backup_vps() {
