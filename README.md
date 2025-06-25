@@ -24,13 +24,13 @@ vpsmenu
 ## Structure
 
 ```bash
-LuciferHEx-Termux-Tools/
+LuciferHEx-Tools/
 ├── README.md
 ├── setup.sh
 ├── .gitignore
 ├── LICENSE
 ├── bin/
-│   └── vpsmenu)
+│   └── vpsmenu
 ├── lib/
 │   └── colors.sh
 ├── data/
