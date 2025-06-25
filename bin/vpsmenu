@@ -306,4 +306,5 @@ remove_vps() {
 }
 
 [[ -f "$HOME/.luciferhex/banner.txt" ]] && cat "$HOME/.luciferhex/banner.txt"
+sleep 2
 main_menu
