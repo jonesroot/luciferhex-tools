@@ -13,7 +13,7 @@ print_menu() {
         "Restore VPS"
         "Update Tools"
         "About LuciferHEx"
-        "Settings"
+        "Uninstaller"
         "Help"
     )
 
