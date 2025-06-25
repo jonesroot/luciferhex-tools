@@ -17,31 +17,34 @@ print_menu() {
         "Help"
     )
 
-    local total=${#items[@]}
-    local half=$(( (total + 1) / 2 ))
     local term_width=$(tput cols)
-    local padding=4
-    local col_width=$(( (term_width - padding * 3) / 2 ))  # dua kolom, 3x padding antar kolom
-    local format="  %-2s %-*s%-2s %s\n"
+    local half=$(( (${#items[@]} + 1) / 2 ))
+    local maxlen=0
+    for item in "${items[@]}"; do
+        [[ ${#item} -gt $maxlen ]] && maxlen=${#item}
+    done
+    local col_width=$((maxlen + 6))
+    printf "${CYAN}%0.s=" $(seq 1 $term_width)
+    echo -e "${RESET}"
 
-    echo -e "${CYAN}$(printf '=%.0s' $(seq 1 $term_width))${RESET}"
-    local title="Welcome to LuciferHEx Tools Termux"
-    printf "%*s\n" $(( (${#title} + term_width) / 2 )) "${GREEN}${title}${RESET}"
-    echo -e "${CYAN}$(printf '=%.0s' $(seq 1 $term_width))${RESET}\n"
+    local title="Welcome to LuciferHEx Termux Tools"
+    printf "%*s\n" $(( (term_width + ${#title}) / 2 )) "${GREEN}${title}${RESET}"
+
+    printf "${CYAN}%0.s=" $(seq 1 $term_width)
+    echo -e "${RESET}\n"
 
     for ((i = 0; i < half; i++)); do
-        left_num=$((i + 1))
-        right_num=$((i + half + 1))
+        left_idx=$((i + 1))
+        right_idx=$((i + half + 1))
 
-        left_label="${items[i]}"
-        if [ $right_num -le $total ]; then
-            right_label="${items[right_num - 1]}"
-            printf "$format" \
-                "${CYAN}${left_num})${RESET}" $col_width "${YELLOW}${left_label}${RESET}" \
-                "${CYAN}${right_num})${RESET}" "${YELLOW}${right_label}${RESET}"
-        else
-            printf "  ${CYAN}${left_num})${RESET} ${YELLOW}${left_label}${RESET}\n"
+        left_text="${CYAN}${left_idx})${RESET} ${YELLOW}${items[i]}${RESET}"
+        printf "  %-*s" $col_width "$left_text"
+
+        if [ $right_idx -le ${#items[@]} ]; then
+            right_text="${CYAN}${right_idx})${RESET} ${YELLOW}${items[right_idx - 1]}${RESET}"
+            printf "%s" "$right_text"
         fi
+        echo
     done
 
     echo -e "\n  ${CYAN}x)${RESET} ${RED}Exit${RESET}\n"
