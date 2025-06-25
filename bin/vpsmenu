@@ -78,7 +78,7 @@ main_menu() {
         6) restore_vps ;;
         7) update_tools ;;
         8) about_luciferhex ;;
-        9) settings_menu ;;
+        9) uninstall_tools ;;
        10) help_menu ;;
         x|X) echo -e "${INFO} Exiting...${RESET}"; exit ;;
         *) echo -e "${FAILED} Invalid selection.${RESET}"; sleep 1 ;;
@@ -119,7 +119,7 @@ update_tools() {
     echo -e "${INFO} Updating LuciferHEx Tools...${RESET}"
     local repo_dir="$HOME/luciferhex-tools"
     local bin_dir="$PREFIX/bin"
-    local commands="vpsmenu"
+    local commands=("vpsmenu")
     local setup_script="$repo_dir/setup.sh"
 
     if [[ ! -d "$repo_dir" ]]; then
@@ -146,11 +146,33 @@ update_tools() {
     }
 
     echo -e "${INFO} Running setup.sh...${RESET}"
-    bash "$setup_script" && \
-        echo -e "${SUCCESS} Tools updated.${RESET}" && \
+    if bash "$setup_script"; then
+        echo -e "${SUCCESS} Tools updated.${RESET}"
         read -n 1 -s -r -p $'\nPress any key to return to main menu...'
-        main_menu || \
+        main_menu
+    else
         echo -e "${FAILED} Setup failed. Please check manually.${RESET}"
+    fi
+}
+
+uninstall_tools() {
+    echo -e "${INFO} Uninstalling LuciferHEx Tools...${RESET}"
+    local bin_dir="$PREFIX/bin"
+    local repo_dir="$HOME/luciferhex-tools"
+    local config_dir="$HOME/.luciferhex"
+    local commands=("vpsmenu")
+
+    echo -e "${INFO} Removing commands from $bin_dir...${RESET}"
+    for cmd in "${commands[@]}"; do
+        [[ -e "$bin_dir/$cmd" ]] && rm -f "$bin_dir/$cmd" && \
+            echo -e "${SUCCESS} Removed: ${CYAN}$cmd${RESET}"
+    done
+
+    echo -e "${INFO} Removing repository and config files...${RESET}"
+    [[ -d "$repo_dir" ]] && rm -rf "$repo_dir" && echo -e "${SUCCESS} Removed repo directory.${RESET}"
+    [[ -d "$config_dir" ]] && rm -rf "$config_dir" && echo -e "${SUCCESS} Removed config directory.${RESET}"
+
+    echo -e "${GREEN}LuciferHEx Tools has been completely uninstalled.${RESET}"
 }
 
 about_luciferhex() {
